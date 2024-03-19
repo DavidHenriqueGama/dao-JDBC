@@ -100,11 +100,26 @@ public class SellerDaoJDBC implements Sellerdao {
 					+ "FROM seller INNER JOIN department "
 					+ "ON seller.DepartmentId = department.Id ");
 			rs = st.executeQuery();
-			if(rs.next()) {
-				Department dep = instantiateDepartment(rs);
+			
+			List<Seller> list = new ArrayList<>();
+			Map<Integer, Department> map = new HashMap<>();
+			
+			while (rs.next()) {
+				
+				Department dep = map.get(rs.getInt("DepartmentId"));
+			
+				
+				if(dep == null) {
+					dep = instantiateDepartment(rs);
+					map.put(rs.getInt("DepartmentId"), dep);
+					
+				}
+				
+
 				Seller obj = instantiateSeller(rs,dep);
+				list.add(obj);
 			}
-			return null;
+			return list;
 		}
 		catch (SQLException e) {
 			throw new DbException(e.getMessage());
